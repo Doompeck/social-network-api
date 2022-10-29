@@ -23,11 +23,11 @@ const thoughtController = {
   getThoughtById({ params }, res) {
     Thought.findOne({ _id: params._id })
       .then((dbThoughtData) => {
-        if (!dbUserData) {
-          res.status(404).json({ message: "No user with this ID is found." });
+        if (!dbThoughtData) {
+          res.status(404).json({ message: "No thought with this ID is found." });
           return;
         }
-        res.json(dbUserData);
+        res.json(dbThoughtData);
       })
       .catch((err) => {
         console.log(err);
@@ -44,17 +44,27 @@ const thoughtController = {
           { new: true },
         );
       })
-      .then((dbThoughtData) => {
+      .then((dbUserData) => {
         if (!dbUserData) {
           res.status(404).json({ message: "No user with this ID is found." });
           return;
         }
         res.json(dbUserData);
       })
-      .catch((err) =>  res.json(err));
+      .catch((err) =>  res.status(400).json(err));
   },
   // update a thought by it's id
-  updateThought() {},
+  updateThought({ params, body }, res) {
+    Thought.findOneAndUpdate({ _id: params.id }, body, { new: true })
+    .then((dbThoughtData) => {
+      if (!dbThoughtData) {
+        res.status(404).json({ message: "No thought with this ID is found." });
+        return;
+      }
+      res.json(dbThoughtData);
+    })
+    .catch((err) =>  res.status(400).json(err));
+  },
   // delete a thought by it's id
   deleteThought() {},
   // add a reaction to a thought
