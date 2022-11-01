@@ -5,7 +5,7 @@ const apiRoutes = require("./api");
 router.use("/api", apiRoutes);
 
 router.use((req, res) => {
-    res.status(404).send("Error Will Robinson!");
+    res.status(404).send('<h1>Error Will Robinson!</h1>');
   });
 
   module.exports = router;

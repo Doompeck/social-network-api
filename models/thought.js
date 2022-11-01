@@ -1,6 +1,6 @@
 const { Schema, model, Types } = require("mongoose");
 
-const reactionsSchema = new Schema(
+const reactionSchema = new Schema(
   {
     reactionId: {
       type: Schema.Types.ObjectId,
@@ -38,7 +38,7 @@ const thoughtSchema = new Schema(
       type: Date,
       default: Date.now,
     },
-    uesername: {
+    username: {
       type: String,
       required: true,
     },
