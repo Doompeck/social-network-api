@@ -14,6 +14,8 @@ const userController = {
   // get a single user by id in the parameters
   getUserById({ params }, res) {
     User.findOne({ _id: params.id })
+    .select("-__v")
+      .populate("thoughts friends")
       .then((dbUserData) => {
         // If no user data found then return error...
         if (!dbUserData) {
@@ -46,11 +48,56 @@ const userController = {
       .catch((err) => res.status(400).json(err));
   },
   //  delete a user by id
-  deleteUser(req, res) {},
+  deleteUser(req, res) {
+    User.findOneAndDelete({ _id: req.params.userId })
+    .then((dbUserData) =>
+      !dbUserData
+        ? res.status(404).json({ message: "No user with this ID is found." })
+        :
+        Thought.deleteMany({ _id: { $in: dbUserData.thoughts } })
+    )
+    .then(() =>
+      res.json({ message: "User and associated thoughts deleted!" })
+    )
+    .catch((err) => {
+      console.log(err);
+      res.status(500).json(err);
+    });
+  },
   // add a friend to a to a user
-  addFriend(req, res) {},
+  addFriend(req, res) {
+    User.findOneAndUpdate(
+      { _id: req.params.userId },
+      { $addToSet: { friends: req.params.friendId } },
+      { runValidators: true, new: true }
+    )
+      .then((dbUserData) =>
+        !dbUserData
+          ? res.status(404).json({ message: "No user with this ID is found." })
+          : res.json(dbUserData)
+      )
+      .catch((err) => {
+        console.log(err);
+        res.status(500).json(err);
+      });
+  },
   // remove a friend
-  removeFriend(req, res) {},
+  removeFriend(req, res) {
+    User.findOneAndUpdate(
+      { _id: req.params.userId },
+      { $pull: { friends: req.params.friendId } },
+      { runValidators: true, new: true }
+    )
+      .then((dbUserData) =>
+        !dbUserData
+          ? res.status(404).json({ message: "No user with this ID is found." })
+          : res.json(dbUserData)
+      )
+      .catch((err) => {
+        console.log(err);
+        res.status(500).json(err);
+      });
+  },
 };
 
 module.exports = userController;
